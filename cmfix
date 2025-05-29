@@ -1,0 +1,33 @@
+#!/bin/bash
+
+echo "Converting all .cue and .m3u files from Windows-1251 to UTF-8..."
+echo
+
+fail_list=()
+
+find . -type f \( -iname "*.cue" -o -iname "*.m3u" \) | while IFS= read -r file; do
+    echo "Processing: $file"
+
+    tmpfile="$(mktemp)"
+
+    # Try converting assuming windows-1251
+    if iconv -f windows-1251 -t utf-8 "$file" -o "$tmpfile"; then
+        mv "$tmpfile" "$file"
+        echo "Successfully converted to UTF-8"
+    else
+        echo "Conversion failed: not valid windows-1251 encoding"
+        fail_list+=("$file")
+        rm -f "$tmpfile"
+    fi
+
+    echo
+done
+
+if [ ${#fail_list[@]} -gt 0 ]; then
+    echo "The following files could not be converted (not valid Windows-1251):"
+    for f in "${fail_list[@]}"; do
+        echo " - $f"
+    done
+else
+    echo "All .cue and .m3u files were successfully converted to UTF-8."
+fi
