@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Converting all .cue and .m3u files from Windows-1251 to UTF-8..."
+echo "Converting files to UTF-8..."
 echo
 
 fail_list=()
@@ -10,7 +10,6 @@ find . -type f \( -iname "*.cue" -o -iname "*.m3u" \) | while IFS= read -r file;
 
     tmpfile="$(mktemp)"
 
-    # Try converting assuming windows-1251
     if iconv -f windows-1251 -t utf-8 "$file" -o "$tmpfile"; then
         mv "$tmpfile" "$file"
         echo "Successfully converted to UTF-8"
@@ -29,5 +28,5 @@ if [ ${#fail_list[@]} -gt 0 ]; then
         echo " - $f"
     done
 else
-    echo "All .cue and .m3u files were successfully converted to UTF-8."
+    echo "All files were successfully converted to UTF-8"
 fi
